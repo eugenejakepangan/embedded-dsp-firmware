@@ -1,4 +1,4 @@
-# eugene-stm32-projects
+# stm32h753zi-baremetal-dsp
 
 Bare-metal embedded projects on STM32H753ZI Nucleo-144.
 No HAL. No CubeMX. Register-level only.
