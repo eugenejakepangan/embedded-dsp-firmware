@@ -105,7 +105,7 @@ stm32h7-baremetal-dsp/
 ## Key References
 
 - RM0433 Rev 8 — STM32H753 Reference Manual
-- DS12110 Rev 11 — STM32H753ZI Datasheet
+- DS12117 Rev 10 — STM32H753xI Datasheet 
 - AN4841 Rev 2 — Digital Signal Processing for STM32 using CMSIS
 - Cortex-M7 Technical Reference Manual r1p2
 - PM0253 — STM32H7 Cortex-M7 Programming Manual
