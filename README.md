@@ -4,7 +4,7 @@
 
 **About me:** Computer engineering student in the Philippines finishing a bare-metal DSP thesis
 on STM32H7, building a 3-year STM32 → RPi4B → PYNQ-Z2 portfolio targeting remote embedded
-roles before relocating to Sweden.
+engineering roles.
 
 Bare-metal embedded projects on the STM32H753ZI — no HAL, no CubeMX, no abstraction layers.
 Every peripheral is configured by writing directly to hardware registers using RM0433.
@@ -15,9 +15,8 @@ DSP work is prototyped in Python (numpy/scipy) and ported to C with CMSIS-DSP.
 ## Goal
 
 This repository is Year 0–1 of a structured embedded systems roadmap:
-finishing my STM32H7 bare-metal + DSP thesis in the Philippines, then
-using this work to apply for remote embedded roles from the Philippines
-before relocating to Sweden.
+finishing my STM32H7 bare-metal + DSP thesis, then using this work
+to apply for remote embedded roles.
 
 The focus is depth over breadth — understanding what the hardware is actually doing
 at the register level, not what a library does on top of it.
@@ -115,10 +114,9 @@ stm32h7-baremetal-dsp/
 
 ## Roadmap
 
-- **Year 0–1 (this repo)** — STM32H7 bare-metal + DSP, thesis completion in the Philippines.
+- **Year 0–1 (this repo)** — STM32H7 bare-metal + DSP, thesis completion.
 - **Year 2** — [rpi4b-embedded-linux-yocto](https://github.com/eugenejakepangan/rpi4b-embedded-linux-yocto): RPi4B + Yocto, STM32 integration.
 - **Year 3** — [pynq-z2-fpga-dsp-system](https://github.com/eugenejakepangan/pynq-z2-fpga-dsp-system): PYNQ-Z2 FPGA + full heterogeneous DSP system capstone.
-- **After Year 3** — Sweden relocation, embedded roles onsite/remote/hybrid.
 
 ---
 
