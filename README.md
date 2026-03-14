@@ -1,11 +1,26 @@
 # stm32h7-baremetal-dsp
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**About me:** Computer engineering student in the Philippines finishing a bare-metal DSP thesis
+on STM32H7, building a 3-year STM32 → RPi4B → PYNQ-Z2 portfolio targeting remote embedded
+roles before relocating to Sweden.
+
 Bare-metal embedded projects on the STM32H753ZI — no HAL, no CubeMX, no abstraction layers.
 Every peripheral is configured by writing directly to hardware registers using RM0433.
 DSP work is prototyped in Python (numpy/scipy) and ported to C with CMSIS-DSP.
 
-This repository is Year 0–1 of a structured embedded systems roadmap targeting
-professional embedded engineering in Sweden.
+---
+
+## Goal
+
+This repository is Year 0–1 of a structured embedded systems roadmap:
+finishing my STM32H7 bare-metal + DSP thesis in the Philippines, then
+using this work to apply for remote embedded roles from the Philippines
+before relocating to Sweden.
+
+The focus is depth over breadth — understanding what the hardware is actually doing
+at the register level, not what a library does on top of it.
 
 ---
 
@@ -48,11 +63,8 @@ python + numpy/scipy  # DSP prototyping and test vector generation
 
 ## How to Build
 
-```bash
-mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake
-make
-```
+> Build system will be added during P01. Each project will have its own
+> CMakeLists.txt. A shared toolchain file will live at `cmake/arm-none-eabi.cmake`.
 
 ---
 
@@ -85,7 +97,7 @@ stm32h7-baremetal-dsp/
 ├── P03-uart-console/
 ├── P04-adc-dma/
 ├── python/           # DSP prototypes, test vectors, ADC plotter
-└── cmake/            # toolchain file
+└── cmake/            # shared toolchain file
 ```
 
 ---
@@ -97,6 +109,15 @@ stm32h7-baremetal-dsp/
 - AN4841 Rev 2 — Digital Signal Processing for STM32 using CMSIS
 - Cortex-M7 Technical Reference Manual r1p2
 - PM0253 — STM32H7 Cortex-M7 Programming Manual
+
+---
+
+## Roadmap
+
+- **Year 0–1 (this repo)** — STM32H7 bare-metal + DSP, plus thesis completion in the Philippines.
+- **Year 2** — [rpi4b-embedded-linux-yocto](https://github.com/eugenejakepangan/rpi4b-embedded-linux-yocto): Raspberry Pi 4B + Yocto and STM32 integration, while working as a remote embedded engineer from the Philippines.
+- **Year 3** — [pynq-z2-fpga-dsp-system](https://github.com/eugenejakepangan/pynq-z2-fpga-dsp-system): PYNQ-Z2 FPGA + RPi4B + STM32 heterogeneous DSP system, built alongside real-world remote experience from the Philippines.
+- **After Year 3** — use this multi-year portfolio and remote experience to move into embedded roles in Sweden (onsite, remote, or hybrid).
 
 ---
 
