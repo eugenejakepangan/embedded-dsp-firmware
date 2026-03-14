@@ -65,6 +65,7 @@ python + numpy/scipy  # DSP prototyping and test vector generation
 
 > Build system will be added during P01. Each project will have its own
 > CMakeLists.txt. A shared toolchain file will live at `cmake/arm-none-eabi.cmake`.
+> The CI badge will be added once the GitHub Actions workflow is running.
 
 ---
 
@@ -114,10 +115,10 @@ stm32h7-baremetal-dsp/
 
 ## Roadmap
 
-- **Year 0–1 (this repo)** — STM32H7 bare-metal + DSP, plus thesis completion in the Philippines.
-- **Year 2** — [rpi4b-embedded-linux-yocto](https://github.com/eugenejakepangan/rpi4b-embedded-linux-yocto): Raspberry Pi 4B + Yocto and STM32 integration, while working as a remote embedded engineer from the Philippines.
-- **Year 3** — [pynq-z2-fpga-dsp-system](https://github.com/eugenejakepangan/pynq-z2-fpga-dsp-system): PYNQ-Z2 FPGA + RPi4B + STM32 heterogeneous DSP system, built alongside real-world remote experience from the Philippines.
-- **After Year 3** — use this multi-year portfolio and remote experience to move into embedded roles in Sweden (onsite, remote, or hybrid).
+- **Year 0–1 (this repo)** — STM32H7 bare-metal + DSP, thesis completion in the Philippines.
+- **Year 2** — [rpi4b-embedded-linux-yocto](https://github.com/eugenejakepangan/rpi4b-embedded-linux-yocto): RPi4B + Yocto, STM32 integration.
+- **Year 3** — [pynq-z2-fpga-dsp-system](https://github.com/eugenejakepangan/pynq-z2-fpga-dsp-system): PYNQ-Z2 FPGA + full heterogeneous DSP system capstone.
+- **After Year 3** — Sweden relocation, embedded roles onsite/remote/hybrid.
 
 ---
 
