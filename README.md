@@ -49,14 +49,22 @@ python + numpy/scipy  # DSP prototyping and test vector generation
 
 ## Projects
 
+### Year 0
+
 | Project | Description | Status |
 |---|---|---|
 | P01 | Bare-metal LED driver — RCC + GPIO register-level | In progress |
-| P02 | Interrupt-driven button — EXTI, NVIC | Planned |
-| P03 | UART debug console — USART3, polling | Planned |
-| P04 | ADC + DMA + Python plotter — 12-bit, pyserial pipeline | Planned |
-| P05 | Timers + PWM — TIM register-level | Planned |
-| P06 | FIR filter in C — CMSIS-DSP arm_fir_q15(), Q1.15 fixed-point | Planned |
+| P02 | Interrupt-driven button — EXTI, NVIC, volatile flag, debounce | Planned |
+| P03 | UART debug console — USART3, baud rate, ring buffer, printf redirect | Planned |
+| P04 | ADC + DMA + Python plotter — 12-bit, pyserial, matplotlib live plot | Planned |
+
+### Year 1
+
+| Project | Description | Status |
+|---|---|---|
+| P05 | SPI sensor interface — register-level, CMake, Unity test, CI/CD | Planned |
+| P06 | Complete DSP signal chain — ADC → FIR in C (CMSIS-DSP) → DAC, Python test vectors | Planned |
+| P07 | FreeRTOS multi-task firmware — tasks, queues, semaphores, GDB task inspector | Planned |
 
 ---
 
@@ -88,16 +96,19 @@ arm-none-eabi-gdb build/project.elf
 
 ```
 stm32h7-baremetal-dsp/
-├── P01-led/
+├── P01-led/                  # Year 0
 │   ├── src/
 │   ├── include/
 │   ├── CMakeLists.txt
 │   └── README.md
-├── P02-button-interrupt/
-├── P03-uart-console/
-├── P04-adc-dma/
-├── python/           # DSP prototypes, test vectors, ADC plotter
-└── cmake/            # shared toolchain file
+├── P02-button-interrupt/     # Year 0
+├── P03-uart-console/         # Year 0
+├── P04-adc-dma/              # Year 0
+├── P05-spi-sensor/           # Year 1
+├── P06-dsp-signal-chain/     # Year 1
+├── P07-freertos/             # Year 1
+├── python/                   # DSP prototypes, test vectors, ADC plotter
+└── cmake/                    # shared toolchain file
 ```
 
 ---
@@ -105,7 +116,7 @@ stm32h7-baremetal-dsp/
 ## Key References
 
 - RM0433 Rev 8 — STM32H753 Reference Manual
-- DS12117 Rev 10 — STM32H753xI Datasheet 
+- DS12117 Rev 10 — STM32H753xI Datasheet
 - AN4841 Rev 2 — Digital Signal Processing for STM32 using CMSIS
 - Cortex-M7 Technical Reference Manual r1p2
 - PM0253 — STM32H7 Cortex-M7 Programming Manual
