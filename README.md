@@ -2,24 +2,17 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**About me:** Computer engineering student in the Philippines finishing a bare-metal DSP thesis
-on STM32H7, building a 3-year STM32 → RPi4B → PYNQ-Z2 portfolio targeting remote embedded
-engineering roles.
+**About:** Bare-metal DSP signal chain on STM32H753ZI — FIR filter, ADC/DMA, CMSIS-DSP, no HAL — thesis foundation for FPGA acceleration
 
-Bare-metal embedded projects on the STM32H753ZI — no HAL, no CubeMX, no abstraction layers.
-Every peripheral is configured by writing directly to hardware registers using RM0433.
-DSP work is prototyped in Python (numpy/scipy) and ported to C with CMSIS-DSP.
+Bare-metal embedded systems portfolio on the STM32H753ZI — no HAL, no CubeMX, register-level only. DSP signal chain prototyped in Python and ported to C with CMSIS-DSP. Year 0–1 of a three-board heterogeneous system: STM32H7 acquisition layer → RPi4B Linux gateway → PYNQ-Z2 FPGA accelerator.
 
 ---
 
 ## Goal
 
-This repository is Year 0–1 of a structured embedded systems roadmap:
-finishing my STM32H7 bare-metal + DSP thesis, then using this work
-to apply for remote embedded roles.
+Register-level firmware engineering — no HAL, no abstraction layers. Every peripheral configured directly from RM0433. DSP prototyped in Python, ported to C with CMSIS-DSP, verified with hardware measurements on the Analog Discovery 2.
 
-The focus is depth over breadth — understanding what the hardware is actually doing
-at the register level, not what a library does on top of it.
+P06 (DSP signal chain) is the thesis practical component — FIR filter designed in Oppenheim and Proakis, implemented in fixed-point C on Cortex-M7, benchmarked against Python test vectors.
 
 ---
 
@@ -120,6 +113,12 @@ stm32h7-baremetal-dsp/
 - AN4841 Rev 2 — Digital Signal Processing for STM32 using CMSIS
 - Cortex-M7 Technical Reference Manual r1p2
 - PM0253 — STM32H7 Cortex-M7 Programming Manual
+
+---
+
+## Development Environment
+
+Arch Linux — GDB + OpenOCD configured from project one.
 
 ---
 
