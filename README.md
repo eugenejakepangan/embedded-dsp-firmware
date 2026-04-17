@@ -31,11 +31,19 @@ P06 (DSP signal chain) is the thesis practical component — FIR filter designed
 ## Toolchain
 
 ```
+# Year 0
 arm-none-eabi-gcc     # compiler
 arm-none-eabi-gdb     # debugger
 openocd               # debug server (ST-Link SWD)
 cmake                 # build system
 python + numpy/scipy  # DSP prototyping and test vector generation
+
+# Year 1 (added progressively from P05)
+unity                 # embedded C unit test framework
+cppcheck              # static analysis (--addon=misra for P06)
+clang-tidy            # additional static analysis
+clang-format          # code style enforcement (CI Stage 3)
+github actions        # CI/CD — build, test, static analysis on every push
 ```
 
 ---
@@ -55,9 +63,11 @@ python + numpy/scipy  # DSP prototyping and test vector generation
 
 | Project | Description | Status |
 |---|---|---|
-| P05 | SPI sensor interface — register-level, CMake, Unity test, CI/CD | Planned |
-| P06 | Complete DSP signal chain — ADC → FIR in C (CMSIS-DSP) → DAC, Python test vectors | Planned |
-| P07 | FreeRTOS multi-task firmware — tasks, queues, semaphores, GDB task inspector | Planned |
+| P05 | SPI sensor interface — register-level, CMake, Unity test, CI/CD Stage 1 | Planned |
+| P05B | FDCAN loopback — register-level FDCAN config, TX/RX verify, custom diagnostic frame format | Planned |
+| P06 | Complete DSP signal chain — ADC → FIR in C (CMSIS-DSP) → DAC, Python test vectors, MISRA C | Planned |
+| P07A | FreeRTOS basic — two tasks, queue, GDB FreeRTOS plugin, CI green | Planned |
+| P07B | FreeRTOS + DSP + power — integrate P06 FIR, idle sleep (WFI), AD2 current measurement, fault injection | Planned |
 
 ---
 
@@ -98,8 +108,10 @@ stm32h7-baremetal-dsp/
 ├── P03-uart-console/         # Year 0
 ├── P04-adc-dma/              # Year 0
 ├── P05-spi-sensor/           # Year 1
+├── P05B-fdcan-loopback/      # Year 1
 ├── P06-dsp-signal-chain/     # Year 1
-├── P07-freertos/             # Year 1
+├── P07A-freertos-basic/      # Year 1
+├── P07B-freertos-dsp-power/  # Year 1
 ├── python/                   # DSP prototypes, test vectors, ADC plotter
 └── cmake/                    # shared toolchain file
 ```
