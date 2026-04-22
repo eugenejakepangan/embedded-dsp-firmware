@@ -31,19 +31,11 @@ P06 (DSP signal chain) is the thesis practical component — FIR filter designed
 ## Toolchain
 
 ```
-# Year 0
 arm-none-eabi-gcc     # compiler
 arm-none-eabi-gdb     # debugger
 openocd               # debug server (ST-Link SWD)
 cmake                 # build system
 python + numpy/scipy  # DSP prototyping and test vector generation
-
-# Year 1 (added progressively from P05)
-unity                 # embedded C unit test framework
-cppcheck              # static analysis (--addon=misra for P06)
-clang-tidy            # additional static analysis
-clang-format          # code style enforcement (CI Stage 3)
-github actions        # CI/CD — build, test, static analysis on every push
 ```
 
 ---
@@ -52,22 +44,23 @@ github actions        # CI/CD — build, test, static analysis on every push
 
 ### Year 0
 
-| Project | Description | Status |
-|---|---|---|
-| P01 | Bare-metal LED driver — RCC + GPIO register-level | In progress |
-| P02 | Interrupt-driven button — EXTI, NVIC, volatile flag, debounce | Planned |
-| P03 | UART debug console — USART3, baud rate, ring buffer, printf redirect | Planned |
-| P04 | ADC + DMA + Python plotter — 12-bit, pyserial, matplotlib live plot | Planned |
+| Project | Description | Tags | Status |
+|---|---|---|---|
+| P01 | Bare-metal LED driver — RCC + GPIO register-level, own startup.s + vector table | `v0.1-stlink-verify` → `v0.1-gdb-verify` → `v0.1` → `v0.1-gdb-integration` | In progress |
+| P02 | Interrupt-driven button — EXTI, NVIC, volatile flag, debounce (AD2 measured) | `v0.2.1-poll` → `v0.2.2-exti` → `v0.2.3-debounce` | Planned |
+| P03 | UART debug console — USART3, baud rate, printf redirect, ring buffer | `v1.0.1-tx-blocking` → `v1.0.2-printf` → `v1.0.3-rx-ringbuffer` | Planned |
+| P04 | ADC + DMA + Python plotter — 12-bit, circular DMA, MPU non-cacheable region, pyserial | `v1.0-adc-poll` → `v1.1-adc-dma` → `v1.2-adc-uart` → `v1.3-adc-plot` → `v1.4-mpu-dma` | Planned |
+| — | Linker script session — DMA buffer relocation, `.dma_buffer` section, objdump verification | — | Planned (between P04 and P05) |
 
 ### Year 1
 
-| Project | Description | Status |
-|---|---|---|
-| P05 | SPI sensor interface — register-level, CMake, Unity test, CI/CD Stage 1 | Planned |
-| P05B | FDCAN loopback — register-level FDCAN config, TX/RX verify, custom diagnostic frame format | Planned |
-| P06 | Complete DSP signal chain — ADC → FIR in C (CMSIS-DSP) → DAC, Python test vectors, MISRA C | Planned |
-| P07A | FreeRTOS basic — two tasks, queue, GDB FreeRTOS plugin, CI green | Planned |
-| P07B | FreeRTOS + DSP + power — integrate P06 FIR, idle sleep (WFI), AD2 current measurement, fault injection | Planned |
+| Project | Description | Tags | Status |
+|---|---|---|---|
+| P05 | SPI sensor interface — register-level, CMake, Unity test, CI/CD Stage 1, Doxygen | `feature/spi-sensor` | Planned |
+| P05B | FDCAN loopback — register-level FDCAN, TX/RX verify, custom diagnostic frame format (ID/length/payload/checksum) | — | Planned |
+| P06 | Complete DSP signal chain — ADC → FIR in C (CMSIS-DSP, Q1.15) → DAC, Python test vectors, MISRA C (cppcheck) | `v2.0-dsp-chain` | Planned |
+| P07A | FreeRTOS basic — two tasks, queue, GDB FreeRTOS plugin, stack high-water mark, CI green | `v2.1-freertos-basic` | Planned |
+| P07B | FreeRTOS + DSP + power — P06 FIR integrated, idle sleep (WFI), AD2 current measurement, fault injection | `v2.2-freertos-dsp` | Planned |
 
 ---
 
@@ -99,21 +92,21 @@ arm-none-eabi-gdb build/project.elf
 
 ```
 stm32h7-baremetal-dsp/
-├── P01-led/                  # Year 0
+├── P01-led/                      # Year 0
 │   ├── src/
 │   ├── include/
 │   ├── CMakeLists.txt
 │   └── README.md
-├── P02-button-interrupt/     # Year 0
-├── P03-uart-console/         # Year 0
-├── P04-adc-dma/              # Year 0
-├── P05-spi-sensor/           # Year 1
-├── P05B-fdcan-loopback/      # Year 1
-├── P06-dsp-signal-chain/     # Year 1
-├── P07A-freertos-basic/      # Year 1
-├── P07B-freertos-dsp-power/  # Year 1
-├── python/                   # DSP prototypes, test vectors, ADC plotter
-└── cmake/                    # shared toolchain file
+├── P02-button-interrupt/         # Year 0
+├── P03-uart-console/             # Year 0
+├── P04-adc-dma/                  # Year 0 — includes MPU config (P04-e)
+├── P05-spi-sensor/               # Year 1
+├── P05B-fdcan-loopback/          # Year 1
+├── P06-dsp-signal-chain/         # Year 1 — thesis practical core
+├── P07A-freertos-basic/          # Year 1
+├── P07B-freertos-dsp-power/      # Year 1
+├── python/                       # DSP prototypes, test vectors, ADC plotter
+└── cmake/                        # shared toolchain file
 ```
 
 ---
