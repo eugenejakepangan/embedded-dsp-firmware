@@ -1,2 +1,56 @@
-templates
+# Build outputs
+build/
+Debug/
+Release/
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.su
+*.a
+*.d
 
+# CMake (from spi-sensor onward)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# STM32 / OpenOCD / GDB
+*.gdb_history
+gdb.log
+openocd.log
+*.cfg.bak
+core
+core.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor — NeoVim
+*.swp
+*.swo
+*~
+.nvim/
+
+# Editor — VS Code (if ever used)
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local templates (never committed)
+templates/

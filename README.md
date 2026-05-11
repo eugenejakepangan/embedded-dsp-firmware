@@ -1,5 +1,7 @@
 # embedded-dsp-firmware
 
+![Status](https://img.shields.io/badge/status-in%20progress-yellow)
+![Board](https://img.shields.io/badge/board-STM32H753ZI-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **About:** Bare-metal DSP firmware on STM32H753ZI — no HAL, register-level, CMSIS-DSP. Part of a three-board heterogeneous system: STM32H7 → RPi4B → PYNQ-Z2.
@@ -129,9 +131,12 @@ embedded-dsp-firmware/
 ├── freertos-dsp-power/
 ├── dual-bank-bootloader/
 ├── python/                # DSP prototypes, test vectors, ADC plotter
-├── cmake/                 # shared toolchain file
-└── templates/             # README, design, performance, CHANGELOG templates
+└── cmake/                 # shared toolchain file
 ```
+
+> `startup.s` and `linker.ld` will migrate to `common/startup/` and `common/linker/`
+> around the `signal-acquisition/` project, once the shared bare-metal infrastructure
+> has stabilised across two or three projects.
 
 ---
 
@@ -142,6 +147,12 @@ embedded-dsp-firmware/
 - AN4841 Rev 2 — Digital Signal Processing for STM32 using CMSIS
 - Cortex-M7 Technical Reference Manual r1p2
 - PM0253 — STM32H7 Cortex-M7 Programming Manual
+
+---
+
+## Release process
+
+Each release is self-reviewed against the [PR template](.github/PULL_REQUEST_TEMPLATE.md) before tagging. The template covers objective, design tradeoff rationale, registers touched, and a documentation checklist.
 
 ---
 
