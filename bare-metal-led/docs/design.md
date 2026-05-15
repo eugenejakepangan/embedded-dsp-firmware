@@ -114,14 +114,14 @@ The `.data` section has two addresses: it runs from DTCM at runtime but is store
 (gdb) x/xw 0x580244E0
 0x580244e0: 0x00000002     // RCC_AHB4ENR: bit 1 set — GPIOB clock enabled
 
-(gdb) p/x GPIOB->MODER
-$1 = 0xXXXXXXX1            // Bits [1:0] = 01 — PB0 output
+(gdb) x/xw 0x58020400
+0x58020400: 0xXXXXXXX1     // GPIOB_MODER: bits [1:0] = 01 — PB0 output
 
-(gdb) p/x GPIOB->ODR
-$2 = 0x00000001             // PB0 high — LED on
+(gdb) x/xw 0x58020414
+0x58020414: 0x00000001      // GPIOB_ODR: PB0 high — LED on
 
-(gdb) p/x GPIOB->ODR
-$3 = 0x00000000             // PB0 low — LED off
+(gdb) x/xw 0x58020414
+0x58020414: 0x00000000      // GPIOB_ODR: PB0 low — LED off
 ```
 
 ## Known limitations

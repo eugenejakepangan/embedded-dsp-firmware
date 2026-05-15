@@ -106,7 +106,7 @@ void HardFault_Handler(void)
 ## Inspecting peripheral registers
 
 ```
-(gdb) x/x 0x40023800   # RCC base (check clock enables)
+(gdb) x/x 0x58024400   # RCC base (check clock enables)
 (gdb) x/x 0x58020000   # GPIOB base
 (gdb) x/x 0xE0001000   # DWT base (cycle counter)
 ```
