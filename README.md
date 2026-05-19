@@ -4,8 +4,6 @@
 ![Board](https://img.shields.io/badge/board-STM32H753ZI-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**About:** Bare-metal DSP firmware on STM32H753ZI — no HAL, register-level, CMSIS-DSP. Part of a three-board heterogeneous system: STM32H7 → RPi4B → PYNQ-Z2.
-
 Bare-metal firmware on the STM32H753ZI — no HAL, no CubeMX, register-level only. DSP signal chain prototyped in Python and ported to C with CMSIS-DSP. Part of a three-board heterogeneous system: STM32H7 acquisition layer → RPi4B Linux gateway → PYNQ-Z2 FPGA accelerator.
 
 ---
@@ -14,7 +12,7 @@ Bare-metal firmware on the STM32H753ZI — no HAL, no CubeMX, register-level onl
 
 Register-level firmware engineering — no HAL, no abstraction layers. Every peripheral configured directly from RM0433. DSP prototyped in Python, ported to C with CMSIS-DSP, verified with hardware measurements on the Analog Discovery 2.
 
-The `dsp-signal-chain/` project is the thesis practical component — FIR filter designed in Oppenheim and Proakis, implemented in fixed-point C on Cortex-M7, benchmarked against Python test vectors.
+The `dsp-signal-chain/` project is the primary milestone — FIR filter designed from Oppenheim and Proakis, implemented in fixed-point C on Cortex-M7, benchmarked against Python test vectors.
 
 The focus is depth over breadth — understanding what the hardware is actually doing at the register level, not what a library does on top of it.
 
@@ -153,6 +151,13 @@ embedded-dsp-firmware/
 ## Release process
 
 Each release is self-reviewed against the [PR template](.github/PULL_REQUEST_TEMPLATE.md) before tagging. The template covers objective, design tradeoff rationale, registers touched, and a documentation checklist.
+
+---
+
+## Related Repositories
+
+- [rpi4b-embedded-linux-yocto](https://github.com/eugenejakepangan/rpi4b-embedded-linux-yocto) — RPi4B + Yocto, embedded Linux gateway layer
+- [pynq-z2-fpga-dsp-system](https://github.com/eugenejakepangan/pynq-z2-fpga-dsp-system) — PYNQ-Z2 FPGA, DSP acceleration and heterogeneous system capstone
 
 ---
 
