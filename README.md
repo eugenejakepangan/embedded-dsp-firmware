@@ -154,13 +154,6 @@ Each release is self-reviewed against the [PR template](.github/PULL_REQUEST_TEM
 
 ---
 
-## Related Repositories
-
-- [rpi4b-embedded-linux-yocto](https://github.com/eugenejakepangan/rpi4b-embedded-linux-yocto) — RPi4B + Yocto, embedded Linux gateway layer
-- [pynq-z2-fpga-dsp-system](https://github.com/eugenejakepangan/pynq-z2-fpga-dsp-system) — PYNQ-Z2 FPGA, DSP acceleration and heterogeneous system capstone
-
----
-
 ## License
 
 MIT — see [LICENSE](LICENSE)
