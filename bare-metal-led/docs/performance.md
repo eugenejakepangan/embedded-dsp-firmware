@@ -1,81 +1,157 @@
 # Performance — bare-metal-led
 
-This file is intentionally sparse for bare-metal-led. The only measurable
-quantity at this stage is build size. The DWT methodology is documented
-now so it is established before it is needed.
+**Project:** `bare-metal-led` · **Release:** `v0.1.0`
+**Target:** STM32H753ZI (Cortex-M7)
+
+> Methodology is written first and is complete. Numbers are `[FILL]`: they
+> come from the toolchain (`size`) and the instrument (AD2) on the actual
+> build. A calculated value placed in a Measured column is fabrication.
 
 ---
 
-## Methodology
+## 1. Methodology (written before the first measurement)
 
-### Cycle counting
+**Build size.** `arm-none-eabi-size build/bare-metal-led.elf` for the
+`.text` / `.data` / `.bss` totals; `arm-none-eabi-size -A` for per-section
+breakdown. Recorded at the tag, and before/after for any change expected to
+move size.
 
-Cortex-M7 DWT cycle counter. Enable once at startup:
+**Stack high-water mark.** Paint the full stack region with `0xDEADBEEF` at
+the start of `main()`, before any function calls. Run the worst-case path.
+Inspect in GDB: `x/Nxw <stack_base>`, where N is derived from the explicit
+reserved stack size defined in `linker.ld` (`N = stack_size_bytes / 4`) — not
+from a subtraction between unrelated symbols such as `_estack − _sdata`
+(`_sdata` is the start of initialized RAM data, not the bottom of the stack,
+so that subtraction does not yield the stack size). Find the lowest address
+where `0xDEADBEEF` is no longer present — that is the high-water mark. If
+none remain, the stack overflowed.
+
+**Timing.** DWT CYCCNT. Enable sequence — `TRCENA` must precede `CYCCNTENA`
+(writing `CYCCNTENA` first produces a counter that does not increment on H7,
+no error), and `CYCCNT` is reset to a known zero before the counter is
+enabled:
 
 ```c
-CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-DWT->CTRL       |= DWT_CTRL_CYCCNTENA_Msk;
-DWT->CYCCNT      = 0;
+CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;  // trace enable first
+DWT->CYCCNT       = 0;                            // reset before enable
+DWT->CTRL        |= DWT_CTRL_CYCCNTENA_Msk;       // then counter enable
 ```
 
-Measure a block:
+Enable before the measured block, not inside it. Time conversion:
+`t_ns = (cycles × 1e9) / F_SYSCLK`.
 
 ```c
-uint32_t start  = DWT->CYCCNT;
-/* ... code under measurement ... */
-uint32_t cycles = DWT->CYCCNT - start;
-/* time_us = cycles / (SystemCoreClock / 1000000) */
+/* No-HAL project: SystemCoreClock is a CMSIS symbol maintained by
+   SystemInit/SystemCoreClockUpdate — neither exists here. Use a constant.
+   Dividing by an unmaintained SystemCoreClock either fails to link or
+   silently uses the reset default (64 MHz), making every conversion wrong. */
+#define F_SYSCLK 64000000u    /* HSI default for this project; update once
+                                  PLL configuration is introduced (between
+                                  uart-console and signal-acquisition) to the
+                                  SYSCLK actually verified for your silicon
+                                  revision — 480000000u on rev V, 400000000u
+                                  on rev Y or an SMPS-supply board (see §4
+                                  and docs/clock-tree.md) */
 ```
 
-Convert cycles to time using `SystemCoreClock`. At 480 MHz:
-1 cycle = 2.08 ns. 1 µs = 480 cycles.
+*For this project, see §5 — timing is N/A.*
 
-### Current measurement
-
-Analog Discovery 2 across a 1 Ω shunt resistor on the 3.3 V rail.
-Voltage across shunt = current in mA. Not applicable for bare-metal-led.
-
-### Build configuration
-
-- Optimization: `-O0` (debug build — no optimization, full symbol information)
-- Compiler: `arm-none-eabi-gcc` [fill in version: `arm-none-eabi-gcc --version`]
-- Silicon revision: check via `DBGMCU->IDCODE` at `0xE00E1000`
+**Power.** Analog Discovery 2 across the board's current path. AD2 resolves
+run-mode current (mA range). Sleep-mode is below AD2 resolution and is not
+present in this project (no `__WFI`); the methodology note is carried
+forward for the first project that sleeps.
 
 ---
 
-## Build size
+## 2. Build configuration
 
-Measured via `arm-none-eabi-size build/firmware.elf`.
+| Field | Value |
+|---|---|
+| Optimization | `[FILL — e.g., -O0]` |
+| Compiler | `arm-none-eabi-gcc [FILL — --version output]` |
+| Silicon revision | STM32H753ZI rev `[FILL — from DBGMCU_IDCODE at 0x5C001000]` |
+| Build command | `[FILL — make / cmake invocation]` |
+| I-cache | off (not enabled in this project) |
+| D-cache | off (not enabled in this project) |
+| FPU | disabled (not enabled in this project) |
 
-| Section | Size | Notes |
+---
+
+## 3. Build size
+
+Measured via `arm-none-eabi-size -A build/bare-metal-led.elf`.
+Baseline for every later project.
+
+| Section | Bytes | Notes |
 |---|---|---|
-| `.text` | [X bytes] | Code + constants in flash |
-| `.data` | [X bytes] | Initialized variables (flash → DTCM at boot) |
-| `.bss` | [X bytes] | Zero-initialized variables in DTCM |
-| **Total flash** | [X bytes] | `.text` + `.data` |
-| **Total RAM** | [X bytes] | `.data` + `.bss` |
+| `.text` | `[FILL]` | Code + vector table + startup.s |
+| `.data` | `[FILL]` | Initialized variables (flash → DTCM copy) |
+| `.bss` | `[FILL]` | Zero-initialized variables in DTCM |
+| **Total flash** | `[FILL]` | `.text` + `.data` load region |
+| Stack (configured) | `[FILL]` | Explicit reserved size from `linker.ld` (e.g. `_Min_Stack_Size`), not a subtraction between unrelated symbols |
+| Stack (high-water) | `[FILL]` | Sentinel method — see §1 |
 
 ---
 
-## Timing
+## 4. Clock verification
 
-Not applicable for bare-metal-led. First timing measurements appear in
-`button-interrupt` (ISR execution time via DWT) and `uart-console`
-(UART throughput via AD2).
+`docs/clock-tree.md` is added once PLL configuration is introduced —
+between `uart-console` and `signal-acquisition` — and does not yet exist for
+this project. Current clock state is the reset default.
+
+| Parameter | Expected | Observed (GDB) | Verified |
+|---|---|---|---|
+| SYSCLK source | HSI (SWS = `0b00`) | `(gdb) x/xw 0x58024410` — bits [5:3] | ☐ |
+| PLL1 | not running (PLL1RDY = 0) | `(gdb) x/xw 0x58024400` — bit 25 | ☐ |
+
+`F_SYSCLK` for this project = `64000000u`. All timing (busy-wait delay loop)
+is relative to 64 MHz. Once PLL configuration is introduced, update to the
+SYSCLK verified for your silicon revision (§2, DBGMCU_IDCODE):
+`480000000u` and a **7.5× faster** blink rate on rev V (480 MHz), or
+`400000000u` and a **6.25× faster** blink rate on rev Y or an SMPS-supply
+board (400 MHz) — without a compensating loop adjustment. Confirm which
+revision applies before assuming either multiplier.
 
 ---
 
-## Power
+## 5. Timing
 
-Not applicable for bare-metal-led. First power measurements appear in
-`freertos-dsp-power` (active vs WFI idle current via AD2).
+**N/A — no time-critical code.**
+The only time-dependent construct is the blink delay — an uncalibrated
+busy-wait, not a deadline. Marking N/A rather than blank records that this
+is a judgement, not an oversight. The DWT methodology in §1 is in place so
+the first timed project (`signal-acquisition` onward) measures on day one.
 
 ---
 
-## Reproducing
+## 6. Power
 
-```bash
-cd bare-metal-led
-make
-arm-none-eabi-size build/firmware.elf
-```
+| Condition | Current | Method |
+|---|---|---|
+| Run, LED on | `[FILL] mA` | AD2 run-mode, 1 Ω shunt |
+| Run, LED off | `[FILL] mA` | AD2 run-mode, 1 Ω shunt |
+
+No sleep mode in this project; sleep-current methodology deferred to the
+first `__WFI` project (the FreeRTOS project).
+
+---
+
+## 7. Regressions
+
+None at `v0.1.0` — this is the baseline. Subsequent size or power changes
+are appended here, noted not hidden.
+
+| Date | Change | Metric | Before | After | Notes |
+|---|---|---|---|---|---|
+| — | baseline | `.text` | — | `[FILL]` | `v0.1.0` |
+
+---
+
+## 8. Reproducing
+
+- **Build:** `[FILL — exact make command from repo root]`
+- **Flash:** `openocd -f board/[FILL — verify this filename against your installed OpenOCD scripts before use, e.g. \`ls /usr/share/openocd/scripts/board/ | grep h7\`; do not assume st_nucleo_h743zi.cfg is present or correct for your version] -c "program build/bare-metal-led.elf verify reset exit"`
+- **GDB attach:** `arm-none-eabi-gdb build/bare-metal-led.elf`, `target extended-remote :3333`, `monitor reset halt`
+- **Build size:** `arm-none-eabi-size -A build/bare-metal-led.elf`
+- **Stack high-water mark:** paint sentinel before any function call, run main loop for 10 s, inspect with `x/Nxw <stack_base>` where N = configured stack size in bytes / 4
+- **Power:** AD2 W2 current measurement across 1 Ω shunt on 3.3 V rail; average over 5 s
