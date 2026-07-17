@@ -24,7 +24,7 @@ The focus is depth over breadth — understanding what the hardware is actually 
 |---|---|
 | MCU | STM32H753ZI — Cortex-M7 @ 480 MHz, 2MB Flash, 1MB RAM |
 | Board | Nucleo-144 |
-| Debugger | ST-Link V3 onboard — SWD |
+| Debugger | ST-Link onboard — SWD |
 | Host | Arch Linux — arm-none-eabi-gcc, OpenOCD, GDB |
 | Instruments | Digilent Analog Discovery 2 |
 
@@ -49,7 +49,6 @@ clang-tidy            # additional static analysis
 clang-format          # code style enforcement
 doxygen               # API documentation
 github actions        # CI/CD — build, test, static analysis on every push
-iar embedded workbench # free kickstart edition — build alongside GCC
 tracealyzer           # FreeRTOS task visualization (Percepio free community edition)
 ```
 
@@ -62,10 +61,14 @@ tracealyzer           # FreeRTOS task visualization (Percepio free community edi
 | `bare-metal-led/` | LED driver — RCC + GPIO register writes, custom startup.s + vector table | `v0.1.0` | In progress |
 | `button-interrupt/` | Interrupt-driven button — EXTI, NVIC, volatile flag, AD2-measured debounce | `v0.2.0` | Planned |
 | `uart-console/` | UART debug console — baud rate, printf redirect, ring buffer | `v0.3.0` | Planned |
-| `signal-acquisition/` | ADC + DMA pipeline — 12-bit, circular DMA, MPU non-cacheable region, pyserial | `v0.4.0` | Planned |
+| `signal-acquisition/` | ADC + DMA pipeline — 16-bit (RES=0 on H7), circular DMA, MPU non-cacheable region, pyserial | `v0.4.0` | Planned |
 | `spi-sensor/` | SPI sensor interface — CMake, Unity test, CI/CD, Doxygen | `v0.5.0` | Planned |
+| `spi-sensor/` *(extension)* | I2C sub-milestone — CR1/CR2/TIMINGR, GDB + AD2 verify | `v0.5.1` | Planned |
+| `spi-sensor/` *(sub-milestone)* | SPI + DMA framebuffer — SPI1 + DMA2 to ST7735S, polled-vs-DMA benchmark | `v0.5.2` | Planned |
 | `fdcan-diagnostic/` | FDCAN loopback — register-level, custom diagnostic frame format | `v0.6.0` | Planned |
 | `dsp-signal-chain/` | DSP signal chain — ADC → FIR in C (CMSIS-DSP, Q1.15) → DAC, MISRA C | `v1.0.0` | Planned |
+| `dsp-signal-chain/` *(extension)* | C++ abstraction layer — `FIRFilter<N,Coeff>` template, RAII, zero-overhead | `v1.0.1` | Planned |
+| `thesis-pipeline/` | Thesis Stages 2-3 — TRNG-BSC + Hamming/SECDED | `pipeline-v1.0.0` | Planned |
 | `freertos-tasks/` | FreeRTOS — two tasks, queue, GDB plugin, stack high-water mark | `v1.1.0` | Planned |
 | `freertos-dsp-power/` | FreeRTOS + DSP + power — FIR integrated, idle sleep, AD2 current, fault injection | `v1.2.0` | Planned |
 | `dual-bank-bootloader/` | Dual-bank bootloader — CRC32, slot selection, rollback, UART firmware update | `v1.3.0` | Planned |
@@ -76,7 +79,7 @@ tracealyzer           # FreeRTOS task visualization (Percepio free community edi
 
 > Build instructions are documented per project inside each folder's `README.md`.
 > Bare-metal projects use GNU Make. Later projects use CMake with a shared toolchain file.
-> The CI badge will be added once the GitHub Actions workflow is running.
+> The CI badge will be added once the GitHub Actions workflow has a confirmed green run.
 
 ---
 
@@ -103,7 +106,6 @@ Each project follows the same layout:
 ```
 project-name/
 ├── README.md          # what it does, how to build, how to verify
-├── CHANGELOG.md       # version history per release
 ├── docs/
 │   ├── design.md      # register decisions, architecture, key code, GDB verification
 │   └── performance.md # measurements, build size, timing data
@@ -114,10 +116,14 @@ project-name/
 └── Makefile           # bare-metal projects / CMakeLists.txt later projects
 ```
 
-Full repo layout:
+Version history lives in a single root `CHANGELOG.md` — no per-project CHANGELOG.
+
+Target full repo layout (populated incrementally — see the project table above for current progress):
 
 ```
 embedded-dsp-firmware/
+├── cmsis/                 # vendored CMSIS-Core / CMSIS-Device headers (register definitions, not HAL)
+├── common/                # shared startup.s / linker.ld / system_stm32h7xx.c — added around signal-acquisition
 ├── bare-metal-led/
 ├── button-interrupt/
 ├── uart-console/
@@ -125,11 +131,13 @@ embedded-dsp-firmware/
 ├── spi-sensor/
 ├── fdcan-diagnostic/
 ├── dsp-signal-chain/
+├── thesis-pipeline/
 ├── freertos-tasks/
 ├── freertos-dsp-power/
 ├── dual-bank-bootloader/
-├── python/                # DSP prototypes, test vectors, ADC plotter
-└── cmake/                 # shared toolchain file
+├── python/                # DSP prototypes, test vectors, ADC plotter — added at signal-acquisition
+├── cmake/                 # shared toolchain file — added at spi-sensor
+└── docs/                  # cross-cutting docs: architecture.md, clock-tree.md, linker-script.md, debugging-guide.md, toolchain-setup.md
 ```
 
 > `startup.s` and `linker.ld` will migrate to `common/startup/` and `common/linker/`
