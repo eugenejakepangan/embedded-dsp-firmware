@@ -9,8 +9,11 @@ yay -S arm-none-eabi-gcc openocd arm-none-eabi-binutils arm-none-eabi-gdb \
        arm-none-eabi-newlib stlink digilent.adept.runtime
 ```
 
-**Digilent Waveforms** does not install cleanly through `yay` — it needs manual
-intervention:
+**Digilent Waveforms** does not install cleanly through a plain `yay -S
+digilent.waveforms` — that first attempt fails at the download step because
+the `.deb` requires a Digilent account login `yay` can't automate.
+
+**If stuck in `yay`'s cache after that failed attempt** — recovery path:
 
 1. `yay -S digilent.waveforms` fails at the download step. Sign in at the
    Digilent site and download `digilent.waveforms_3.25.1_amd64.deb` manually.
@@ -20,16 +23,63 @@ intervention:
    - Comment out or remove the `source_aarch64=(...)` and
      `sha256sums_aarch64=(...)` lines.
    - Leave the passing `sha256sums_x86_64` hash as-is.
-4. Run `makepkg -si`. This produces `digilent.waveforms-3.25.1-1.src.tar.gz`.
-5. Extract and inspect:
+4. Run `makepkg -si`. From this cache location, this only produces
+   `digilent.waveforms-3.25.1-1.src.tar.gz` — a **source** package, not a
+   binary one.
+   > **Do not try `sudo pacman -U digilent.waveforms-3.25.1-1.src.tar.gz` —
+   > it will not work.** `pacman -U` only installs binary packages
+   > (`.pkg.tar.zst` / `.pkg.tar.xz`). A `.src.tar.gz` is the source package
+   > `makepkg` produces for distribution, not something `pacman` can install
+   > directly — it isn't a recognized installable format at all.
+5. Extract it into a fresh build directory instead:
    ```bash
    mkdir -p ~/build/digilent.waveforms
    tar xfz digilent.waveforms-3.25.1-1.src.tar.gz -C ~/build/
    cd ~/build/digilent.waveforms/
    ```
-6. Copy the downloaded `.deb` into that directory, then run `makepkg -si`
-   again. Enter the password when prompted — Waveforms installs successfully
-   on this second pass.
+6. Copy the downloaded `.deb` into that fresh directory, then run
+   `makepkg -si` again from here. This second pass builds and installs the
+   real binary package — Waveforms installs successfully at this point.
+
+**Cleaner alternative, avoiding the two-pass rebuild entirely:** skip `yay`
+and clone the AUR package directly, then do the same manual download and
+edit — this starts from a clean directory instead of `yay`'s partially-failed
+cache, and only needs one `makepkg -si` pass:
+
+```bash
+git clone https://aur.archlinux.org/digilent.waveforms.git ~/.cache/yay/digilent.waveforms
+cd ~/.cache/yay/digilent.waveforms
+```
+
+Then the same steps 2–3 above (download the `.deb` into this directory, edit
+the `PKGBUILD`), then:
+
+```bash
+makepkg -si
+```
+
+This produces `digilent.waveforms-3.25.1-1-x86_64.pkg.tar.zst` — a real
+binary package — and installs it directly in one pass.
+
+**Waveforms installs but won't launch — shared library fix.** The error:
+
+```
+waveforms: error while loading shared libraries: libdmgr.so.2: cannot open shared object file: No such file or directory
+```
+
+Fixed with two changes — registering the Digilent runtime path is the
+complete fix on its own; the symlink is a narrower one-file patch that's
+redundant once the path is registered, kept here because both were applied:
+
+```bash
+# Register the Digilent runtime path so the dynamic linker can find it
+echo '/usr/lib/digilent/adept' | sudo tee /etc/ld.so.conf.d/digilent-adept.conf
+sudo ldconfig
+
+# Narrower one-file symlink — not needed once the path above is registered,
+# but applied at the same time
+sudo ln -s /usr/lib/digilent/adept/libdmgr.so.2 /usr/lib/libdmgr.so.2
+```
 
 ## Versions confirmed
 
@@ -183,7 +233,16 @@ git log --show-signature -1
   `/etc/udev/rules.d/` by default on this system — they ship with the
   `stlink` package under `/usr/lib/udev/rules.d/` and have to be copied over
   manually.
-- **Digilent Waveforms can't be installed automatically via `yay`.** It
-  requires manually downloading the `.deb` from the Digilent site and editing
-  the AUR package's `PKGBUILD` to drop the `aarch64` architecture entries
-  before `makepkg -si` succeeds.
+- **Digilent Waveforms — first attempt via plain `yay -S` failed**, because
+  `yay` can't automate the Digilent account login the `.deb` download
+  requires. Building from `yay`'s cache after that (manual download +
+  `PKGBUILD` edit) produces a `.src.tar.gz` source package on the first
+  `makepkg -si` pass — **`pacman -U` cannot install this format**; it
+  extracts into a fresh directory and needs a second `makepkg -si` there to
+  actually build and install. Cloning the AUR package fresh
+  (`git clone https://aur.archlinux.org/digilent.waveforms.git`) instead of
+  starting from `yay`'s cache avoids the two-pass rebuild — same manual
+  download and edit, one `makepkg -si` pass.
+- **WaveForms installed but failed to launch** —
+  `libdmgr.so.2: cannot open shared object file`. Fixed by registering
+  `/usr/lib/digilent/adept` in `ld.so.conf.d` and running `ldconfig`.
