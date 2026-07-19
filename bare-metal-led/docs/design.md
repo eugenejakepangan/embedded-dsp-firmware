@@ -17,10 +17,7 @@ GPIOB clock, configure PB0 as a push-pull output, and toggle it.
 ## 2. System Dependency Map
 
 **Full form.** Four Cortex-M7 core registers are considered and left at
-reset in this project (CPACR, SCB_CCR, SCB_AIRCR, MPU) — shown as a sibling
-branch rather than silently omitted, since this is the first public
-artifact in the portfolio and evaluated-and-declined vs. forgotten is
-exactly the signal a reviewer is looking for here.
+reset in this project (CPACR, SCB_CCR, SCB_AIRCR, MPU) 
 
 ```
 STM32H753ZI
