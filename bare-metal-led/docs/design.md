@@ -14,7 +14,46 @@ GPIOB clock, configure PB0 as a push-pull output, and toggle it.
 
 ---
 
-## 2. Architecture rationale
+## 2. System Dependency Map
+
+**Full form.** Four Cortex-M7 core registers are considered and left at
+reset in this project (CPACR, SCB_CCR, SCB_AIRCR, MPU) — shown as a sibling
+branch rather than silently omitted, since this is the first public
+artifact in the portfolio and evaluated-and-declined vs. forgotten is
+exactly the signal a reviewer is looking for here.
+
+```
+STM32H753ZI
+│
+├── Cortex-M7 core registers — considered, left at reset
+│   ├── CPACR (FPU) — off
+│   ├── SCB_CCR (I-cache / D-cache) — off
+│   ├── SCB_AIRCR (PRIGROUP) — 0
+│   └── MPU — not configured
+│
+└── Active dependency chain (required for this project)
+
+    startup.s (Reset_Handler)
+        │
+        ▼
+    Vector table (4 entries — SP, Reset, NMI, HardFault)
+        │
+        ▼
+    RCC_AHB4ENR — GPIOBEN (bit 1)
+        │   clock must be enabled — writes before this are silently discarded
+        ▼
+    GPIOB_MODER — PB0 = output (01)
+        │   OTYPER / OSPEEDR / PUPDR left at reset — adequate for a DC LED
+        ▼
+    GPIOB_BSRR — set / clear PB0
+        │
+        ▼
+    LED LD1 (PB0) — verified via GPIOB_ODR
+```
+
+---
+
+## 3. Architecture rationale
 
 - **No HAL / register-level.** The goal of this project is to make the silicon legible. A
   HAL call hides which register changed and why; writing the register directly
@@ -31,10 +70,10 @@ GPIOB clock, configure PB0 as a push-pull output, and toggle it.
 
 ---
 
-## 3. Register-level implementation
+## 4. Register-level implementation
 
-> **Ordering constraint:** core → clock → pin → peripheral → interrupt.
-> Violating the order produces silent failures, not errors.
+> **Ordering constraint:** see the System Dependency Map (§2) above —
+> violating that order produces silent failures, not errors.
 
 Register + address, bit field, value written, rationale, GDB verification.
 Registers deliberately left at reset are documented as choices, not omissions.
@@ -184,7 +223,7 @@ non-changes, not omissions.
 **Register:** `GPIOB_BSRR` at `0x58020418` — RM0433 §11.4.7
 **Bit field:** bit 0 BS0 — set PB0 high; bit 16 BR0 — reset PB0 low
 **Value written:** `(1u << 0)` to set; `(1u << 16)` to clear
-**Rationale:** See §4 (Design decisions) for the full BSRR vs. ODR argument.
+**Rationale:** See §5 (Design decisions) for the full BSRR vs. ODR argument.
 BSRR is write-only — it cannot be read back and its written value does not
 persist. Verification is therefore via `GPIOB_ODR` (offset `0x14`), which
 reflects the current output latch state.
@@ -197,7 +236,7 @@ reflects the current output latch state.
 
 ---
 
-## 4. Design decisions
+## 5. Design decisions
 
 ### BSRR over ODR
 
@@ -225,7 +264,7 @@ interrupt-safe; introduces a lost-update race that becomes observable in
 
 ---
 
-## 5. Wrong hypotheses
+## 6. Wrong hypotheses
 
 #### Assumed writing `GPIOB_MODER` alone would configure the output
 
@@ -233,7 +272,7 @@ Wrote `GPIOB_MODER` before enabling `GPIOBEN` in `RCC_AHB4ENR`. GDB showed
 MODER **unchanged at its reset value (`0xFFFFFEBF`)** after the write — the
 LED stayed dark. This reads as a GPIO bug; it is a **clock bug** — the write
 hit an unpowered peripheral and was silently discarded (the mechanism stated
-in §3). Fix: move the `RCC_AHB4ENR` write ahead of any GPIOB access.
+in §4). Fix: move the `RCC_AHB4ENR` write ahead of any GPIOB access.
 
 *Note on the reset value: `GPIOB_MODER` resets to `0xFFFFFEBF`, not
 `0x00000000`. If GDB shows `0x00000000` after a failed write, the peripheral
@@ -242,9 +281,9 @@ is not just underpowered — something else is wrong. The expected
 
 ---
 
-## 6. GDB verification summary
+## 7. GDB verification summary
 
-Every register in §3 appears here with its observed value. Tagging `v0.1.0`
+Every register in §4 appears here with its observed value. Tagging `v0.1.0`
 is blocked until every row is filled and every checkbox is ticked. Values
 below are what GDB actually showed — not the expected values restated; if
 observed ≠ expected, the discrepancy belongs in this table with an
@@ -261,7 +300,7 @@ explanation.
 
 ---
 
-## 7. Memory layout
+## 8. Memory layout
 
 > Full memory region map, section placement, and linker decisions are in
 > `docs/linker-script.md`, added between `signal-acquisition` and
@@ -286,7 +325,7 @@ respectively.
 
 ---
 
-## 8. Startup and boot sequence
+## 9. Startup and boot sequence
 
 `startup.s` for this project is minimal — sufficient here, replaced once
 `button-interrupt` writes the full vector table:
@@ -304,7 +343,7 @@ respectively.
 
 ---
 
-## 9. Known limitations
+## 10. Known limitations
 
 - **4-entry vector table.** Cannot support any peripheral interrupt.
   `button-interrupt` writes the full table; alternatively, adopt the full
@@ -313,15 +352,15 @@ respectively.
   introduced between `uart-console` and `signal-acquisition`. All timing
   (busy-wait delay) in this project is relative to 64 MHz and will run
   **faster at 480 MHz (rev V) — 7.5×; or at 400 MHz (rev Y / SMPS supply) —
-  6.25×** — once that happens. Confirm silicon revision (§3, DBGMCU_IDCODE)
-  before assuming which multiplier applies.
+  6.25×** — once that happens. Confirm silicon revision (`docs/performance.md`
+  §2, DBGMCU_IDCODE) before assuming which multiplier applies.
 - **Uncalibrated busy-wait delay.** The blink period is frequency-dependent
   and unverified. Not a limitation for a proof-of-toolchain project; becomes
   one if any real timing is assumed.
 
 ---
 
-## 10. Downstream assumptions
+## 11. Downstream assumptions
 
 Decisions in this project that later projects — and eventually RTOS
 integration — build on. Undocumented here becomes an undocumented
