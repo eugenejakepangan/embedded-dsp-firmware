@@ -1,4 +1,4 @@
-# embedded-dsp-firmware
+# stm32h7-dsp-firmware
 
 ![Status](https://img.shields.io/badge/status-in%20progress-yellow)
 ![Board](https://img.shields.io/badge/board-STM32H753ZI-green)
@@ -121,7 +121,7 @@ Version history lives in a single root `CHANGELOG.md` — no per-project CHANGEL
 Target full repo layout (populated incrementally — see the project table above for current progress):
 
 ```
-embedded-dsp-firmware/
+stm32h7-dsp-firmware/
 ├── cmsis/                 # vendored CMSIS-Core / CMSIS-Device headers (register definitions, not HAL)
 ├── common/                # shared startup.s / linker.ld / system_stm32h7xx.c — added around signal-acquisition
 ├── bare-metal-led/
